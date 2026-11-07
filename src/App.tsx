@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -11,442 +12,272 @@ import { StockHistoryTable, type StockHistoryLog } from "./components/History";
 import { LowStockTable, type LowStockData } from "./components/LowStock";
 import { UpdateStockForm, type StockUpdatePayload } from "./components/Update";
 
-const pantryData: StockData[] = [
-  {
-    no: 1,
-    namaBarang: "Tisu wastafel Lt 1",
-    jumlahStok: 14,
-    jumlahPemakaianPenambahan: 0,
-    tanggalUpdate: "2026-11-06",
-    keterangan: "Lokasi Lt 1",
-    penanggungJawab: "-",
-    jumlahStokTerakhir: 14,
-    tanggalUpdateTerakhir: "2026-11-06",
-  },
-  {
-    no: 2,
-    namaBarang: "Tisu wastafel Lt 2",
-    jumlahStok: 16,
-    jumlahPemakaianPenambahan: 0,
-    tanggalUpdate: "2026-11-06",
-    keterangan: "Lokasi Lt 2",
-    penanggungJawab: "-",
-    jumlahStokTerakhir: 16,
-    tanggalUpdateTerakhir: "2026-11-06",
-  },
-  {
-    no: 3,
-    namaBarang: "Tisu toilet Lt 1",
-    jumlahStok: 29,
-    jumlahPemakaianPenambahan: 0,
-    tanggalUpdate: "2026-11-06",
-    keterangan: "Lokasi Lt 1",
-    penanggungJawab: "-",
-    jumlahStokTerakhir: 29,
-    tanggalUpdateTerakhir: "2026-11-06",
-  },
-  {
-    no: 4,
-    namaBarang: "Tisu toilet Lt 2",
-    jumlahStok: 8,
-    jumlahPemakaianPenambahan: 0,
-    tanggalUpdate: "2026-11-06",
-    keterangan: "Lokasi Lt 2",
-    penanggungJawab: "-",
-    jumlahStokTerakhir: 8,
-    tanggalUpdateTerakhir: "2026-11-06",
-  },
-  {
-    no: 5,
-    namaBarang: "Gula",
-    jumlahStok: 3,
-    jumlahPemakaianPenambahan: 0,
-    tanggalUpdate: "2026-11-06",
-    keterangan: "-",
-    penanggungJawab: "-",
-    jumlahStokTerakhir: 3,
-    tanggalUpdateTerakhir: "2026-11-06",
-  },
-  {
-    no: 6,
-    namaBarang: "Jahe manis",
-    jumlahStok: 5,
-    jumlahPemakaianPenambahan: 0,
-    tanggalUpdate: "2026-11-06",
-    keterangan: "-",
-    penanggungJawab: "-",
-    jumlahStokTerakhir: 5,
-    tanggalUpdateTerakhir: "2026-11-06",
-  },
-  {
-    no: 7,
-    namaBarang: "Jahe tawar",
-    jumlahStok: 2,
-    jumlahPemakaianPenambahan: 0,
-    tanggalUpdate: "2026-11-06",
-    keterangan: "-",
-    penanggungJawab: "-",
-    jumlahStokTerakhir: 2,
-    tanggalUpdateTerakhir: "2026-11-06",
-  },
-  {
-    no: 8,
-    namaBarang: "Teh",
-    jumlahStok: 13,
-    jumlahPemakaianPenambahan: 0,
-    tanggalUpdate: "2026-11-06",
-    keterangan: "-",
-    penanggungJawab: "-",
-    jumlahStokTerakhir: 13,
-    tanggalUpdateTerakhir: "2026-11-06",
-  },
-  {
-    no: 9,
-    namaBarang: "Liquid elektrik (obat nyamuk)",
-    jumlahStok: 5,
-    jumlahPemakaianPenambahan: 0,
-    tanggalUpdate: "2026-11-06",
-    keterangan: "-",
-    penanggungJawab: "-",
-    jumlahStokTerakhir: 5,
-    tanggalUpdateTerakhir: "2026-11-06",
-  },
-  {
-    no: 10,
-    namaBarang: "Galon",
-    jumlahStok: 16,
-    jumlahPemakaianPenambahan: 0,
-    tanggalUpdate: "2026-11-06",
-    keterangan: "-",
-    penanggungJawab: "-",
-    jumlahStokTerakhir: 16,
-    tanggalUpdateTerakhir: "2026-11-06",
-  },
-  {
-    no: 11,
-    namaBarang: "Detergen",
-    jumlahStok: 3,
-    jumlahPemakaianPenambahan: 0,
-    tanggalUpdate: "2026-11-06",
-    keterangan: "-",
-    penanggungJawab: "-",
-    jumlahStokTerakhir: 3,
-    tanggalUpdateTerakhir: "2026-11-06",
-  },
-  {
-    no: 12,
-    namaBarang: "Spon Cuci",
-    jumlahStok: 3,
-    jumlahPemakaianPenambahan: 0,
-    tanggalUpdate: "2026-11-06",
-    keterangan: "-",
-    penanggungJawab: "-",
-    jumlahStokTerakhir: 3,
-    tanggalUpdateTerakhir: "2026-11-06",
-  },
-  {
-    no: 13,
-    namaBarang: "Bayclin",
-    jumlahStok: 2,
-    jumlahPemakaianPenambahan: 0,
-    tanggalUpdate: "2026-11-06",
-    keterangan: "-",
-    penanggungJawab: "-",
-    jumlahStokTerakhir: 2,
-    tanggalUpdateTerakhir: "2026-11-06",
-  },
-  {
-    no: 14,
-    namaBarang: "Bagus fresh",
-    jumlahStok: 3,
-    jumlahPemakaianPenambahan: 0,
-    tanggalUpdate: "2026-11-06",
-    keterangan: "Ruang Executive/VIP",
-    penanggungJawab: "-",
-    jumlahStokTerakhir: 3,
-    tanggalUpdateTerakhir: "2026-11-06",
-  },
-  {
-    no: 15,
-    namaBarang: "Vixal",
-    jumlahStok: 1,
-    jumlahPemakaianPenambahan: 0,
-    tanggalUpdate: "2026-11-06",
-    keterangan: "-",
-    penanggungJawab: "-",
-    jumlahStokTerakhir: 1,
-    tanggalUpdateTerakhir: "2026-11-06",
-  },
-  {
-    no: 16,
-    namaBarang: "Eco enzim",
-    jumlahStok: 1,
-    jumlahPemakaianPenambahan: 0,
-    tanggalUpdate: "2026-11-06",
-    keterangan: "-",
-    penanggungJawab: "-",
-    jumlahStokTerakhir: 1,
-    tanggalUpdateTerakhir: "2026-11-06",
-  },
-  {
-    no: 17,
-    namaBarang: "Sabun cuci piring",
-    jumlahStok: 1,
-    jumlahPemakaianPenambahan: 0,
-    tanggalUpdate: "2026-11-06",
-    keterangan: "-",
-    penanggungJawab: "-",
-    jumlahStokTerakhir: 1,
-    tanggalUpdateTerakhir: "2026-11-06",
-  },
-  {
-    no: 18,
-    namaBarang: "Kamper",
-    jumlahStok: 7,
-    jumlahPemakaianPenambahan: 0,
-    tanggalUpdate: "2026-11-06",
-    keterangan: "-",
-    penanggungJawab: "-",
-    jumlahStokTerakhir: 7,
-    tanggalUpdateTerakhir: "2026-11-06",
-  },
-  {
-    no: 19,
-    namaBarang: "Bagus lemari",
-    jumlahStok: 5,
-    jumlahPemakaianPenambahan: 0,
-    tanggalUpdate: "2026-11-06",
-    keterangan: "-",
-    penanggungJawab: "-",
-    jumlahStokTerakhir: 5,
-    tanggalUpdateTerakhir: "2026-11-06",
-  },
-  {
-    no: 20,
-    namaBarang: "Trika",
-    jumlahStok: 1,
-    jumlahPemakaianPenambahan: 0,
-    tanggalUpdate: "2026-11-06",
-    keterangan: "-",
-    penanggungJawab: "-",
-    jumlahStokTerakhir: 1,
-    tanggalUpdateTerakhir: "2026-11-06",
-  },
-  {
-    no: 21,
-    namaBarang: "Karbol",
-    jumlahStok: 1,
-    jumlahPemakaianPenambahan: 0,
-    tanggalUpdate: "2026-11-06",
-    keterangan: "-",
-    penanggungJawab: "-",
-    jumlahStokTerakhir: 1,
-    tanggalUpdateTerakhir: "2026-11-06",
-  },
-  {
-    no: 22,
-    namaBarang: "Handwash",
-    jumlahStok: 1,
-    jumlahPemakaianPenambahan: 0,
-    tanggalUpdate: "2026-11-06",
-    keterangan: "-",
-    penanggungJawab: "-",
-    jumlahStokTerakhir: 1,
-    tanggalUpdateTerakhir: "2026-11-06",
-  },
-  {
-    no: 23,
-    namaBarang: "Molto",
-    jumlahStok: 0,
-    jumlahPemakaianPenambahan: 0,
-    tanggalUpdate: "2026-11-06",
-    keterangan: "Kosong / Mau Habis",
-    penanggungJawab: "-",
-    jumlahStokTerakhir: 0,
-    tanggalUpdateTerakhir: "2026-11-06",
-  },
-  {
-    no: 24,
-    namaBarang: "Baygon semprot",
-    jumlahStok: 0,
-    jumlahPemakaianPenambahan: 0,
-    tanggalUpdate: "2026-11-06",
-    keterangan: "Kosong / Mau Habis",
-    penanggungJawab: "-",
-    jumlahStokTerakhir: 0,
-    tanggalUpdateTerakhir: "2026-11-06",
-  },
-  {
-    no: 25,
-    namaBarang: "Cream massage",
-    jumlahStok: 0,
-    jumlahPemakaianPenambahan: 0,
-    tanggalUpdate: "2026-11-06",
-    keterangan: "Kosong / Mau Habis",
-    penanggungJawab: "-",
-    jumlahStokTerakhir: 0,
-    tanggalUpdateTerakhir: "2026-11-06",
-  },
-];
+// ─────────────────────────────────────────────
+// API layer (via Vite proxy: /api → localhost:3000)
+// ─────────────────────────────────────────────
+const BASE = "/api";
 
-const mockHistoryData: StockHistoryLog[] = [
-  {
-    id: 101,
-    no: 1,
-    namaBarang: "Tisu toilet Lt 1",
-    tanggal: "2026-11-06 08:15",
-    keterangan: "Pemakaian rutin toilet Lt 1 (Sesi Pagi)",
-    jumlah: -2,
-    penanggungJawab: "Budi",
-    stokSetelahUpdate: 29,
-    stokSebelumUpdate: 31,
-  },
-  {
-    id: 102,
-    no: 2,
-    namaBarang: "Galon",
-    tanggal: "2026-11-06 09:00",
-    keterangan: "Restock galon dari vendor",
-    jumlah: 10,
-    penanggungJawab: "Eko",
-    stokSetelahUpdate: 17,
-    stokSebelumUpdate: 7,
-  },
-  {
-    id: 103,
-    no: 3,
-    namaBarang: "Tisu wastafel Lt 2",
-    tanggal: "2026-11-06 10:30",
-    keterangan: "Refill dispenser wastafel Lt 2",
-    jumlah: -1,
-    penanggungJawab: "Siti",
-    stokSetelahUpdate: 16,
-    stokSebelumUpdate: 17,
-  },
-  {
-    id: 104,
-    no: 4,
-    namaBarang: "Molto",
-    tanggal: "2026-11-06 11:10",
-    keterangan: "Pemakaian sachet terakhir (Stok Habis)",
-    jumlah: -1,
-    penanggungJawab: "Siti",
-    stokSetelahUpdate: 0,
-    stokSebelumUpdate: 1,
-  },
-  {
-    id: 105,
-    no: 5,
-    namaBarang: "Tisu toilet Lt 1",
-    tanggal: "2026-11-06 14:45",
-    keterangan: "Ganti roll tambahan toilet Lt 1",
-    jumlah: -1,
-    penanggungJawab: "Budi",
-    stokSetelahUpdate: 28,
-    stokSebelumUpdate: 29,
-  },
-  {
-    id: 106,
-    no: 6,
-    namaBarang: "Galon",
-    tanggal: "2026-11-06 15:20",
-    keterangan: "Pasang dispenser Lt 1",
-    jumlah: -1,
-    penanggungJawab: "Eko",
-    stokSetelahUpdate: 16,
-    stokSebelumUpdate: 17,
-  },
-  {
-    id: 107,
-    no: 7,
-    namaBarang: "Teh",
-    tanggal: "2026-11-05 16:00",
-    keterangan: "Pemakaian untuk rapat sore",
-    jumlah: -2,
-    penanggungJawab: "Budi",
-    stokSetelahUpdate: 13,
-    stokSebelumUpdate: 15,
-  },
-];
+async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  const res = await fetch(`${BASE}${path}`, {
+    credentials: "include",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    ...options,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.message || "Request gagal");
+  return data;
+}
 
-const mockLowStockData: LowStockData[] = [
-  {
-    no: 1,
-    namaBarang: "Molto",
-    jumlahStok: 0,
-    tanggalPemakaianTerakhir: "2026-11-06",
-  },
-  {
-    no: 2,
-    namaBarang: "Baygon semprot",
-    jumlahStok: 0,
-    tanggalPemakaianTerakhir: "2026-11-06",
-  },
-  {
-    no: 3,
-    namaBarang: "Cream massage",
-    jumlahStok: 0,
-    tanggalPemakaianTerakhir: "2026-11-06",
-  },
-  {
-    no: 4,
-    namaBarang: "Vixal",
-    jumlahStok: 1,
-    tanggalPemakaianTerakhir: "2026-11-05",
-  },
-  {
-    no: 5,
-    namaBarang: "Eco enzim",
-    jumlahStok: 1,
-    tanggalPemakaianTerakhir: "2026-11-04",
-  },
-  {
-    no: 6,
-    namaBarang: "Sabun cuci piring",
-    jumlahStok: 1,
-    tanggalPemakaianTerakhir: "2026-11-06",
-  },
-  {
-    no: 7,
-    namaBarang: "Trika",
-    jumlahStok: 1,
-    tanggalPemakaianTerakhir: "2026-11-03",
-  },
-  {
-    no: 8,
-    namaBarang: "Karbol",
-    jumlahStok: 1,
-    tanggalPemakaianTerakhir: "2026-11-05",
-  },
-  {
-    no: 9,
-    namaBarang: "Handwash",
-    jumlahStok: 1,
-    tanggalPemakaianTerakhir: "2026-11-06",
-  },
-  {
-    no: 10,
-    namaBarang: "Jahe tawar",
-    jumlahStok: 2,
-    tanggalPemakaianTerakhir: "2026-11-06",
-  },
-  {
-    no: 11,
-    namaBarang: "Bayclin",
-    jumlahStok: 2,
-    tanggalPemakaianTerakhir: "2026-11-02",
-  },
-];
+interface User {
+  id: string;
+  nama: string;
+}
 
-function App() {
-  const itemNames = pantryData.map((item) => item.namaBarang);
+interface StockMovement {
+  id: string;
+  tipe: string;
+  jumlah: number;
+  stokSebelum: number;
+  stokSesudah: number;
+  tanggal: string;
+  penanggungJawab: { nama: string };
+  barang?: { nama: string; stok: number };
+}
 
-  const handleStockUpdateSubmit = (data: StockUpdatePayload) => {
-    console.log("Payload dikirim ke backend:", data);
-    alert(
-      `Update Stok Berhasil:\nBarang: ${data.namaBarang}\nTipe: ${data.keterangan}\nJumlah: ${data.jumlahUpdate}`,
-    );
+interface StockItem {
+  id: string;
+  nama: string;
+  stok: number;
+  updateTerakhir: {
+    tipe: string;
+    jumlah: number;
+    stokSebelum: number;
+    stokSesudah: number;
+    tanggal: string;
+    penanggungJawab: string;
+  } | null;
+}
+
+const api = {
+  getMe: () => request<{ data: User }>("/me"),
+  login: (nama: string) =>
+    request<{ data: User }>("/login", {
+      method: "POST",
+      body: JSON.stringify({ nama }),
+    }),
+  logout: () => request<{ message: string }>("/logout", { method: "POST" }),
+  getStock: () => request<{ data: StockItem[] }>("/stock").then((r) => r.data),
+  getAllHistory: () =>
+    request<{ data: StockMovement[] }>("/history").then((r) => r.data),
+  updateStock: (payload: {
+    id: string;
+    jumlah: number;
+    keterangan: "PEMAKAIAN" | "RESTOCK";
+  }) =>
+    request<{ data: { stokSebelum: number; stokSesudah: number } }>("/update", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+};
+
+// Ambang batas stok dianggap "menipis"
+const LOW_STOCK_THRESHOLD = 3;
+
+// ─────────────────────────────────────────────
+// Adapters: API model → tipe komponen tabel
+// ─────────────────────────────────────────────
+function toStockData(items: StockItem[]): StockData[] {
+  return items.map((it, i) => ({
+    no: i + 1,
+    namaBarang: it.nama,
+    jumlahStok: it.stok,
+    jumlahPemakaianPenambahan: it.updateTerakhir?.jumlah ?? 0,
+    tanggalUpdate: it.updateTerakhir?.tanggal?.slice(0, 10) ?? "-",
+    keterangan: it.updateTerakhir?.tipe ?? "-",
+    penanggungJawab: it.updateTerakhir?.penanggungJawab ?? "-",
+    jumlahStokTerakhir: it.updateTerakhir?.stokSesudah ?? it.stok,
+    tanggalUpdateTerakhir: it.updateTerakhir?.tanggal?.slice(0, 10) ?? "-",
+  }));
+}
+
+function toLowStockData(items: StockItem[]): LowStockData[] {
+  return items
+    .filter((it) => it.stok <= LOW_STOCK_THRESHOLD)
+    .sort((a, b) => a.stok - b.stok)
+    .map((it, i) => ({
+      no: i + 1,
+      namaBarang: it.nama,
+      jumlahStok: it.stok,
+      tanggalPemakaianTerakhir: it.updateTerakhir?.tanggal?.slice(0, 10) ?? "-",
+    }));
+}
+
+function toHistoryLogs(movements: StockMovement[]): StockHistoryLog[] {
+  return movements.map((m, i) => ({
+    id: i + 1,
+    no: i + 1,
+    namaBarang: m.barang?.nama ?? "-",
+    tanggal: m.tanggal,
+    keterangan: m.tipe,
+    jumlah: m.tipe === "PEMAKAIAN" ? -m.jumlah : m.jumlah,
+    penanggungJawab: m.penanggungJawab?.nama ?? "-",
+    stokSetelahUpdate: m.stokSesudah,
+    stokSebelumUpdate: m.stokSebelum,
+  }));
+}
+
+// ─────────────────────────────────────────────
+// Login form
+// ─────────────────────────────────────────────
+function LoginForm({ onLogin }: { onLogin: (u: User) => void }) {
+  const [nama, setNama] = useState("");
+  const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!nama.trim()) {
+      setErr("Nama wajib diisi");
+      return;
+    }
+    setLoading(true);
+    setErr("");
+    try {
+      const r = await api.login(nama.trim());
+      onLogin(r.data);
+    } catch (e: any) {
+      setErr(e.message);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  return (
+    <div
+      style={{
+        maxWidth: 360,
+        margin: "80px auto",
+        padding: 24,
+        border: "1px solid #ddd",
+        borderRadius: 8,
+      }}
+    >
+      <h2 style={{ marginBottom: 16 }}>Login Stok Pantry</h2>
+      <form
+        onSubmit={submit}
+        style={{ display: "flex", flexDirection: "column", gap: 12 }}
+      >
+        <label>
+          Nama kamu
+          <input
+            type="text"
+            value={nama}
+            onChange={(e) => setNama(e.target.value)}
+            placeholder="Masukkan nama"
+            style={{ width: "100%", padding: 8, marginTop: 4 }}
+            autoFocus
+          />
+        </label>
+        <button
+          type="submit"
+          disabled={loading}
+          style={{
+            padding: "10px 16px",
+            cursor: loading ? "not-allowed" : "pointer",
+          }}
+        >
+          {loading ? "Memuat..." : "Masuk"}
+        </button>
+        {err && <p style={{ color: "red", margin: 0 }}>{err}</p>}
+      </form>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────
+// App
+// ─────────────────────────────────────────────
+function App() {
+  const [user, setUser] = useState<User | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [stockItems, setStockItems] = useState<StockItem[]>([]);
+  const [historyLogs, setHistoryLogs] = useState<StockHistoryLog[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // 1. Cek sesi saat mount (cookie 7 hari)
+  useEffect(() => {
+    api
+      .getMe()
+      .then((r) => setUser(r.data))
+      .catch(() => setUser(null))
+      .finally(() => setAuthChecked(true));
+  }, []);
+
+  // 2. Ambil data stok + history saat user login
+  useEffect(() => {
+    if (user) refreshAll();
+  }, [user]);
+
+  const refreshAll = async () => {
+    setLoading(true);
+    try {
+      const [stocks, histories] = await Promise.all([
+        api.getStock(),
+        api.getAllHistory(),
+      ]);
+      setStockItems(stocks);
+      setHistoryLogs(toHistoryLogs(histories));
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await api.logout().catch(() => {});
+    setUser(null);
+    setStockItems([]);
+    setHistoryLogs([]);
+  };
+
+  // 3. Submit form update stok
+  const handleStockUpdateSubmit = async (data: StockUpdatePayload) => {
+    const barang = stockItems.find((s) => s.nama === data.namaBarang);
+    if (!barang) {
+      alert("Barang tidak ditemukan");
+      return;
+    }
+
+    // Normalisasi label form ke format backend
+    const keterangan: "PEMAKAIAN" | "RESTOCK" = data.keterangan
+      .toLowerCase()
+      .includes("pakai")
+      ? "PEMAKAIAN"
+      : "RESTOCK";
+
+    try {
+      await api.updateStock({
+        id: barang.id,
+        jumlah: data.jumlahUpdate,
+        keterangan,
+      });
+      await refreshAll();
+      alert(
+        `Update Stok Berhasil:\nBarang: ${data.namaBarang}\nTipe: ${keterangan}\nJumlah: ${data.jumlahUpdate}`,
+      );
+    } catch (e: any) {
+      alert(`Gagal update: ${e.message}`);
+    }
+  };
+
+  // ── Render guards ──
+  if (!authChecked) return <p style={{ padding: 24 }}>Memuat...</p>;
+  if (!user) return <LoginForm onLogin={setUser} />;
+
+  const itemNames = stockItems.map((i) => i.nama);
+  const stockTableData = toStockData(stockItems);
+  const lowStockData = toLowStockData(stockItems);
 
   return (
     <BrowserRouter>
@@ -485,11 +316,30 @@ function App() {
             Stok Pantry Habis/Kosong
           </NavLink>
         </nav>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            marginLeft: "auto",
+          }}
+        >
+          <span style={{ fontSize: 14 }}>
+            Login sebagai: <strong>{user.nama}</strong>
+          </span>
+          <button
+            onClick={handleLogout}
+            style={{ padding: "6px 12px", cursor: "pointer" }}
+          >
+            Logout
+          </button>
+        </div>
       </section>
 
       <hr className="divider" />
 
       <main style={{ padding: "24px" }}>
+        {loading && <p style={{ marginBottom: 12 }}>Memuat data...</p>}
         <Routes>
           <Route path="/" element={<Navigate to="/stok" replace />} />
           <Route
@@ -497,7 +347,7 @@ function App() {
             element={
               <section className="data-section">
                 <h2 className="title-data-stok">Data Stok Pantry</h2>
-                <StockTable data={pantryData} />
+                <StockTable data={stockTableData} />
               </section>
             }
           />
@@ -520,7 +370,7 @@ function App() {
             element={
               <section className="history-data">
                 <h2>Riwayat Penggunaan Stok Pantry</h2>
-                <StockHistoryTable data={mockHistoryData} />
+                <StockHistoryTable data={historyLogs} />
               </section>
             }
           />
@@ -529,7 +379,7 @@ function App() {
             element={
               <section className="lowstock-data">
                 <h2>Daftar Stok Habis & Menipis</h2>
-                <LowStockTable data={mockLowStockData} />
+                <LowStockTable data={lowStockData} />
               </section>
             }
           />

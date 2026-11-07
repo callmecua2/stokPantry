@@ -277,8 +277,47 @@ app.post('/update', requireUser, async (req: AuthedRequest, res: Response) => {
     }
 })
 
+
+// ─────────────────────────────────────────────
+// POST /users — buat user baru (nama saja)
+// ─────────────────────────────────────────────
+app.post('/users', async (req: Request, res: Response) => {
+    try {
+        const { nama } = req.body
+
+        if (!nama || typeof nama !== 'string' || nama.trim() === '') {
+            return res.status(400).json({ message: "Nama wajib diisi" })
+        }
+
+        const trimmedNama = nama.trim()
+
+        // Cek duplikat karena `nama` tidak @unique di schema
+        const existing = await prisma.user.findFirst({ where: { nama: trimmedNama } })
+        if (existing) {
+            return res.status(409).json({
+                message: "User dengan nama tersebut sudah ada",
+                data: { id: existing.id, nama: existing.nama }
+            })
+        }
+
+        const user = await prisma.user.create({ data: { nama: trimmedNama } })
+
+        return res.status(201).json({
+            message: "User berhasil dibuat",
+            data: { id: user.id, nama: user.nama }
+        })
+
+    } catch (error) {
+        console.error("Error /users:", error)
+        return res.status(500).json({ message: "Internal server error" })
+    }
+})
+
 // ─────────────────────────────────────────────
 // POST /login
+// ─────────────────────────────────────────────
+// ─────────────────────────────────────────────
+// POST /login — hanya user terdaftar
 // ─────────────────────────────────────────────
 app.post('/login', async (req: Request, res: Response) => {
     try {
@@ -290,17 +329,19 @@ app.post('/login', async (req: Request, res: Response) => {
 
         const trimmedNama = nama.trim()
 
-        // findFirst karena `nama` di schema tidak @unique
-        let user = await prisma.user.findFirst({ where: { nama: trimmedNama } })
+        // Hanya boleh login jika nama sudah terdaftar
+        const user = await prisma.user.findFirst({ where: { nama: trimmedNama } })
         if (!user) {
-            user = await prisma.user.create({ data: { nama: trimmedNama } })
+            return res.status(401).json({
+                message: "Nama tidak terdaftar. Hubungi admin untuk didaftarkan."
+            })
         }
 
         res.cookie(COOKIE_NAME, user.id, {
             maxAge: COOKIE_MAX_AGE,
             httpOnly: true,
             sameSite: 'lax',
-            secure: false,     // ganti true jika pakai HTTPS
+            secure: false,
             path: '/',
         })
 
@@ -314,7 +355,6 @@ app.post('/login', async (req: Request, res: Response) => {
         return res.status(500).json({ message: "Internal server error" })
     }
 })
-
 // ─────────────────────────────────────────────
 // GET /me — cek sesi aktif
 // ─────────────────────────────────────────────
