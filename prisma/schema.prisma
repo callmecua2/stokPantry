@@ -14,53 +14,40 @@ datasource db {
 
 
 model User {
-  id String  @id @default(uuid())
-  nama String
+  id        String   @id @default(uuid())
+  nama      String
 
-  dataUpdate DataStockUpdate[]
-  barang Barang[]
+  barang    Barang[]         // barang yang diinput user ini
+  movements StockMovement[]  // movement yang dipertanggungjawabkan
 }
-
-enum keterangan {
-  Pemakaian
-  Restock
-}
-
 
 model Barang {
-  id String @id @default(uuid())
-  nama String
-  stok Int ?
+  id          String @id @default(uuid())
+  nama        String
+  stok        Int    @default(0)      // ← source of truth stok terkini
 
   inputOlehId String
-  inputOleh User @relation(fields: [inputOlehId], references: [id])  
-  dataUpdate DataStockUpdate[]
+  inputOleh   User   @relation(fields: [inputOlehId], references: [id])
+
+  movements   StockMovement[]
 }
 
-model DataStockUpdate {
-  id String @id @default(uuid())
+model StockMovement {
+  id          String   @id @default(uuid())
 
-  idBarang String
-  barang Barang @relation(fields: [idBarang], references: [id])
+  idBarang    String
+  barang      Barang   @relation(fields: [idBarang], references: [id])
 
-  jumlahUpdate Int?
-  tanggalUpdate DateTime @default(now())
-  keterangan String
+  tipe        String   // "PEMAKAIAN" | "RESTOCK" | "INISIALISASI"
+  jumlah      Int      // SELALU positif, arah ditentukan oleh `tipe`
+
+  stokSebelum Int      // snapshot stok sebelum update
+  stokSesudah Int      // snapshot stok sesudah update
 
   penanggungJawabId String
-  penanggungJawab User @relation(fields: [penanggungJawabId], references: [id])
+  penanggungJawab   User   @relation(fields: [penanggungJawabId], references: [id])
 
-  jumlahStokTerakhir Int?
-  tanggalUpdateTerakhir DateTime ?
+  tanggal     DateTime @default(now())
 
-  riwayat RiwayatUpdateStok[]
-
-}
-
-model RiwayatUpdateStok {
-  id String @id @default(uuid())
-
-  updateId String
-  riwayatUpdate DataStockUpdate @relation(fields: [updateId], references: [id])
-
+  @@index([idBarang, tanggal])   // percepat query "latest per barang"
 }
