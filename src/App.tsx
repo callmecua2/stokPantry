@@ -242,35 +242,27 @@ function App() {
   };
 
   // 3. Submit form update stok
-  const handleStockUpdateSubmit = async (data: StockUpdatePayload) => {
-    const barang = stockItems.find((s) => s.nama === data.namaBarang);
-    if (!barang) {
-      alert("Barang tidak ditemukan");
-      return;
-    }
+ const handleStockUpdateSubmit = async (data: StockUpdatePayload) => {
+  const barang = stockItems.find((s) => s.nama === data.namaBarang);
+  if (!barang) {
+    alert("Barang tidak ditemukan");
+    return;
+  }
 
-    // Normalisasi label form ke format backend
-    const keterangan: "PEMAKAIAN" | "RESTOCK" = data.keterangan
-      .toLowerCase()
-      .includes("pakai")
-      ? "PEMAKAIAN"
-      : "RESTOCK";
-
-    try {
-      await api.updateStock({
-        id: barang.id,
-        jumlah: data.jumlahUpdate,
-        keterangan,
-      });
-      await refreshAll();
-      alert(
-        `Update Stok Berhasil:\nBarang: ${data.namaBarang}\nTipe: ${keterangan}\nJumlah: ${data.jumlahUpdate}`,
-      );
-    } catch (e: any) {
-      alert(`Gagal update: ${e.message}`);
-    }
-  };
-
+  try {
+    await api.updateStock({
+      id: barang.id,
+      jumlah: data.jumlahUpdate,
+      keterangan: data.keterangan,   // ← langsung, tanpa translasi
+    });
+    await refreshAll();
+    alert(
+      `Update Stok Berhasil:\nBarang: ${data.namaBarang}\nTipe: ${data.keterangan}\nJumlah: ${data.jumlahUpdate}`,
+    );
+  } catch (e: any) {
+    alert(`Gagal update: ${e.message}`);
+  }
+};
   // ── Render guards ──
   if (!authChecked) return <p style={{ padding: 24 }}>Memuat...</p>;
   if (!user) return <LoginForm onLogin={setUser} />;

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 export interface StockUpdatePayload {
   namaBarang: string;
-  keterangan: 'Pemakaian' | 'Restock';
+  keterangan: 'PEMAKAIAN' | 'RESTOCK';   // ← enum backend
   jumlahUpdate: number;
 }
 
@@ -13,7 +13,7 @@ interface UpdateStockFormProps {
 
 export const UpdateStockForm: React.FC<UpdateStockFormProps> = ({ itemList, onSubmit }) => {
   const [namaBarang, setNamaBarang] = useState<string>(itemList[0] || '');
-  const [keterangan, setKeterangan] = useState<'Pemakaian' | 'Restock'>('Pemakaian');
+  const [keterangan, setKeterangan] = useState<'PEMAKAIAN' | 'RESTOCK'>('PEMAKAIAN');
   const [jumlahUpdate, setJumlahUpdate] = useState<number | ''>('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -58,12 +58,12 @@ export const UpdateStockForm: React.FC<UpdateStockFormProps> = ({ itemList, onSu
         <label style={labelStyle}>Keterangan</label>
         <select
           value={keterangan}
-          onChange={(e) => setKeterangan(e.target.value as 'Pemakaian' | 'Restock')}
+          onChange={(e) => setKeterangan(e.target.value as 'PEMAKAIAN' | 'RESTOCK')}
           style={inputStyle}
           required
         >
-          <option value="Pemakaian">Pemakaian</option>
-          <option value="Restock">Restock</option>
+          <option value="PEMAKAIAN">Pemakaian</option>
+          <option value="RESTOCK">Restock</option>
         </select>
       </div>
 
@@ -86,6 +86,9 @@ export const UpdateStockForm: React.FC<UpdateStockFormProps> = ({ itemList, onSu
     </form>
   );
 };
+
+// ─── styles (tidak berubah) ───
+// ... (biarkan seperti aslinya)
 
 const formStyle: React.CSSProperties = {
   maxWidth: '450px',
