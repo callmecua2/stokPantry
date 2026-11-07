@@ -1,6 +1,6 @@
 import { Elysia } from 'elysia'
 import { cors } from '@elysiajs/cors'
-import prisma from './lib/prisma'
+import prisma from "../../lib/prisma" // ← diperbaiki: ../ bukan ../../
 
 const port = Number(process.env.PORT) || 3000
 
@@ -11,36 +11,7 @@ const COOKIE_NAME = 'userId'
 const COOKIE_MAX_AGE_SECONDS = 7 * 24 * 60 * 60 // 7 hari (detik)
 
 // ─────────────────────────────────────────────
-// Auth plugin: derive user dari cookie + guard
-// Meniru middleware `requireUser` di Express
-// ─────────────────────────────────────────────
-const auth = new Elysia({ name: 'auth' })
-  .derive(async ({ cookie }) => {
-    const userId = cookie[COOKIE_NAME]?.value as string | undefined
-    let user: { id: string; nama: string } | null = null
-
-    if (userId) {
-      const found = await prisma.user.findUnique({ where: { id: userId } })
-      if (found) user = { id: found.id, nama: found.nama }
-    }
-    return { user, userId }
-  })
-  .onBeforeHandle(({ user, userId, status, cookie }) => {
-    if (!userId) {
-      return status(401, { message: 'Silakan login dulu' })
-    }
-    if (!user) {
-      cookie[COOKIE_NAME]?.remove()
-      return status(401, { message: 'Sesi tidak valid, login ulang' })
-    }
-  })
-
-// ─────────────────────────────────────────────
-// Route yang butuh auth
-// ─────────────────────────────────────────────
-// ─────────────────────────────────────────────
-// Route yang butuh auth
-// derive di-inline agar tipenya ter-propagate
+// Route yang butuh auth (derive inline)
 // ─────────────────────────────────────────────
 const protectedRoutes = new Elysia()
   .derive(
@@ -174,16 +145,17 @@ const protectedRoutes = new Elysia()
       return status(500, { message: 'Internal server error' })
     }
   })
+
 // ─────────────────────────────────────────────
-// Aplikasi utama
+// Aplikasi utama — prefix /api agar cocok dengan frontend
 // ─────────────────────────────────────────────
-const app = new Elysia()
+const app = new Elysia({ prefix: '/api' }) // ← KUNCI
   .use(cors({ origin: true, credentials: true }))
 
-  // GET / ─────────────────────────────────────
+  // GET /api ─────────────────────────────────
   .get('/', () => 'Hello World!')
 
-  // GET /stock ────────────────────────────────
+  // GET /api/stock ────────────────────────────
   .get('/stock', async ({ status }) => {
     try {
       const barangs = await prisma.barang.findMany({
@@ -225,7 +197,7 @@ const app = new Elysia()
     }
   })
 
-  // GET /history ──────────────────────────────
+  // GET /api/history ──────────────────────────
   .get('/history', async ({ status }) => {
     try {
       const data = await prisma.stockMovement.findMany({
@@ -246,7 +218,7 @@ const app = new Elysia()
     }
   })
 
-  // GET /stock/:id/history ────────────────────
+  // GET /api/stock/:id/history ────────────────
   .get('/stock/:id/history', async ({ params: { id }, status }) => {
     try {
       if (!id) return status(400, { message: 'ID barang wajib diisi' })
@@ -274,7 +246,7 @@ const app = new Elysia()
     }
   })
 
-  // POST /users ───────────────────────────────
+  // POST /api/users ───────────────────────────
   .post('/users', async ({ body, status }) => {
     try {
       const { nama } = body as { nama: string }
@@ -306,7 +278,7 @@ const app = new Elysia()
     }
   })
 
-  // POST /login ───────────────────────────────
+  // POST /api/login ───────────────────────────
   .post('/login', async ({ body, cookie, status }) => {
     try {
       const { nama } = body as { nama: string }
@@ -330,7 +302,9 @@ const app = new Elysia()
       c.value = user.id
       c.httpOnly = true
       c.sameSite = 'lax'
-      c.secure = false
+      // Di production (HTTPS Vercel), sebaiknya secure: true.
+      // Set false hanya kalau frontend & backend beda origin saat dev.
+      c.secure = process.env.NODE_ENV === 'production'
       c.path = '/'
       c.maxAge = COOKIE_MAX_AGE_SECONDS
 
@@ -344,7 +318,7 @@ const app = new Elysia()
     }
   })
 
-  // GET /me ───────────────────────────────────
+  // GET /api/me ───────────────────────────────
   .get('/me', async ({ cookie, status }) => {
     try {
       const userId = cookie[COOKIE_NAME]?.value as string | undefined
@@ -365,7 +339,7 @@ const app = new Elysia()
     }
   })
 
-  // POST /logout ──────────────────────────────
+  // POST /api/logout ──────────────────────────
   .post('/logout', ({ cookie }) => {
     cookie[COOKIE_NAME]?.remove()
     return { message: 'Logout berhasil' }
