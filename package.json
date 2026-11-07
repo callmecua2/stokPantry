@@ -10,11 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@elysiajs/cors": "^1.4.3",
     "@prisma/adapter-pg": "^7.10.1",
     "@prisma/client": "7",
     "axios": "^1.21.0",
     "cookie-parser": "^1.4.7",
     "dotenv": "^18.0.9",
+    "elysia": "^1.4.31",
     "express": "^5.3.0",
     "pg": "^8.23.1",
     "react": "^19.3.1",
